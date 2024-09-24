@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                // Add your build commands here
+                sh 'echo Build complete.'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                // Simulated test command
+                script {
+                    def testResult = sh './result.sh'
+                    if (testResult != 0) {
+                        error 'Tests failed. Please fix the issues.'
+                    } else {
+                        echo 'Tests passed successfully!'
+                    }
+                }
+            }
+        }
+
+        stage('Code Coverage Check') {
+            steps {
+                echo 'Checking code coverage...'
+                script {
+                    def coverage = sh(script: 'check_coverage.sh', returnStdout: true).trim()
+                    if (coverage.toInteger() < 80) { // Example threshold of 80%
+                        error "Code coverage is below the required threshold: ${coverage}%"
+                    } else {
+                        echo "Code coverage is acceptable: ${coverage}%"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                // Add your deploy commands here
+                sh 'echo Deployment complete.'
+            }
+        }
+    }
+
+    post {
+        success { 
+            echo 'success'
+        }
+        failure {
+            echo 'fail'
+        }
+       
+    }
+}
